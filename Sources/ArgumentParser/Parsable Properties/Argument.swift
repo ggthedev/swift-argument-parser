@@ -130,6 +130,38 @@ public enum ArgumentArrayParsingStrategy {
 }
 
 extension Argument {
+  public init<T: ExpressibleByArgument>(
+    help: ArgumentHelp? = nil
+  ) where Value == T? {
+    self.init(_parsedValue: .init { key in
+      ArgumentSet(
+        key: key,
+        kind: .positional,
+        parsingStrategy: .nextAsValue,
+        parseType: T.self,
+        name: .long,
+        default: nil,
+        help: help)
+    })
+  }
+  
+  @available(*, deprecated, message: "Default values don't make sense for optional properties. Remove the 'default' parameter if its value is nil, or make your property non-optional if it's non-nil.")
+  public init<T: ExpressibleByArgument>(
+    default initial: T?,
+    help: ArgumentHelp? = nil
+  ) where Value == T? {
+    self.init(_parsedValue: .init { key in
+      ArgumentSet(
+        key: key,
+        kind: .positional,
+        parsingStrategy: .nextAsValue,
+        parseType: T.self,
+        name: .long,
+        default: initial,
+        help: help)
+    })
+  }
+  
   /// Creates a property that reads its value from an argument, parsing with
   /// the given closure.
   ///
